@@ -25,11 +25,14 @@ class ConnectionTest extends TestCase
     /**
      * @test
      */
-    public function it_returns_a_statement_from_a_query()
+    public function it_returns_a_pdo_compatible_response_on_query()
     {
         $result = $this->realConnection()
                        ->runQuery('select * from users');
         $this->assertInstanceOf(PDOStatement::class, $result);
+        $users = $result->fetchAll();
+        $this->assertCount(2, $users);
+        $this->assertEquals('two@example.com', $users[1]['email']);
     }
 
     /**

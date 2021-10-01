@@ -27,30 +27,17 @@ class Connection
 
     public function runQuery(string $sql, ?array $bindings = null): PDOStatement
     {
-        try {
-            $this->reconnectIfMissingConnection();
-            $query = $this->prepareAndExecuteQuery($sql, $bindings);
-        } catch (Throwable $e) {
-            if (!$this->causedByLostConnection($e)) {
-                throw $e;
-            }
-            $query = $this->retryQuery($sql, $bindings);
-        }
-        return $query;
-    }
-
-    private function retryQuery(string $sql, ?array $bindings = null): PDOStatement
-    {
         $this->currentAttempts = 1;
+        $forceReconnect = false;
+
         while ($this->currentAttempts < $this->maxAttempts) {
             try {
-                $this->reconnect();
-                $query = $this->prepareAndExecuteQuery($sql, $bindings);
-                return $query;
+                return $this->connectAndPerformQuery($sql, $bindings, $forceReconnect);
             } catch (Throwable $e) {
                 if (!$this->causedByLostConnection($e)) {
                     throw $e;
                 }
+                $forceReconnect = true;
                 $this->currentAttempts ++;
             }
         }
@@ -71,8 +58,13 @@ class Connection
         throw $connectionException;
     }
 
-    private function prepareAndExecuteQuery(string $sql, ?array $bindings): PDOStatement
+    private function connectAndPerformQuery(string $sql, ?array $bindings, bool $forceReconnect = false): PDOStatement
     {
+        if ($forceReconnect) {
+            $this->reconnect();
+        } else {
+            $this->reconnectIfMissingConnection();
+        }
         $query = $this->pdo->prepare($sql);
         $query->execute($bindings);
         return $query;

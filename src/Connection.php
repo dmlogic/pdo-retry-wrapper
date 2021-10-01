@@ -27,8 +27,8 @@ class Connection
 
     public function runQuery(string $sql, ?array $bindings = null): PDOStatement
     {
-        $this->reconnectIfMissingConnection();
         try {
+            $this->reconnectIfMissingConnection();
             $query = $this->prepareAndExecuteQuery($sql, $bindings);
         } catch (Throwable $e) {
             if (!$this->causedByLostConnection($e)) {
@@ -44,13 +44,14 @@ class Connection
         $this->currentAttempts = 1;
         while ($this->currentAttempts < $this->maxAttempts) {
             try {
+                $this->reconnect();
                 $query = $this->prepareAndExecuteQuery($sql, $bindings);
                 return $query;
             } catch (Throwable $e) {
-                $this->currentAttempts ++;
                 if (!$this->causedByLostConnection($e)) {
                     throw $e;
                 }
+                $this->currentAttempts ++;
             }
         }
         return $this->throwConnectionException($e, $sql, $bindings);

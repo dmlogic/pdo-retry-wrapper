@@ -15,7 +15,7 @@ class ConnectionException extends Exception
     public function __construct(Throwable $original, int $attempts, $query = null, $bindings = null)
     {
         $this->message = $original->getMessage();
-        $this->code = 0;
+        $this->code = $original->getCode();
         $this->originalException = $original;
         $this->attempts = $attempts;
         $this->query = $query;

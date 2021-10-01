@@ -28,7 +28,7 @@ class ConnectionTest extends TestCase
     public function it_returns_a_statement_from_a_query()
     {
         $result = $this->realConnection()
-                       ->performQuery('select * from users');
+                       ->runQuery('select * from users');
         $this->assertInstanceOf(PDOStatement::class, $result);
     }
 
@@ -39,7 +39,7 @@ class ConnectionTest extends TestCase
     {
         $this->expectException(PDOException::class);
         $result = $this->realConnection()
-                       ->performQuery('select * from notatable');
+                       ->runQuery('select * from notatable');
     }
 
     /**
@@ -51,7 +51,7 @@ class ConnectionTest extends TestCase
         $this->expectException(ConnectionException::class);
         $this->expectExceptionMessage($expectedException);
         $result = $this->mockedConnection($expectedException)
-                        ->performQuery('select * from users');
+                        ->runQuery('select * from users');
     }
 
     /**
@@ -63,7 +63,7 @@ class ConnectionTest extends TestCase
         $this->expectException(ConnectionException::class);
         $this->expectExceptionMessage($expectedException);
         $result = $this->mockedConnection(null, $expectedException)
-                        ->performQuery('select * from users');
+                        ->runQuery('select * from users');
     }
 
     /**
@@ -79,7 +79,7 @@ class ConnectionTest extends TestCase
         try {
             $expectedException = 'server has gone away';
             $this->mockedConnection($expectedException, null, $callBack)
-                        ->performQuery('select * from users');
+                        ->runQuery('select * from users');
             $this->assertTrue(false);
         } catch (ConnectionException $e) {
             $this->assertSame('edited to server has gone away', $_ENV['marker']);
@@ -93,7 +93,7 @@ class ConnectionTest extends TestCase
     {
         try {
             $this->mockedConnection(null, 'server has gone away')
-                        ->performQuery('select * from users');
+                        ->runQuery('select * from users');
             $this->assertTrue(false);
         } catch (ConnectionException $e) {
             $this->assertSame(3, $e->getAttempts());

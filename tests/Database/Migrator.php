@@ -10,23 +10,25 @@ class Migrator
 
     public function __invoke($database)
     {
-        $this->createConnection($database);
-        $this->createTables();
-        return $this->pdo;
+        $pdo = $this->createConnection($database);
+        $this->createTables($pdo);
+        return function () use ($pdo) {
+            return $pdo;
+        };
     }
 
-    protected function createTables()
+    protected function createTables($pdo)
     {
-        $this->pdo->exec('CREATE TABLE IF NOT EXISTS users (
+        $pdo->exec('CREATE TABLE IF NOT EXISTS users (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
                             email TEXT(255) NOT NULL);');
-        $this->pdo->exec('insert into users(email) values("one@example.com")');
-        $this->pdo->exec('insert into users(email) values("two@example.com")');
+        $pdo->exec('insert into users(email) values("one@example.com")');
+        $pdo->exec('insert into users(email) values("two@example.com")');
     }
 
     protected function createConnection($database)
     {
-        $this->pdo = new PDO(
+        return new PDO(
             $database,
             'root',
             'root',

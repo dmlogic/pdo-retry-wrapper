@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Throwable;
 use PDOException;
 use PDOStatement;
 use Tests\Database\Migrator;
@@ -38,7 +39,7 @@ class ConnectionTest extends TestCase
     {
         $this->expectException(PDOException::class);
         $result = $this->realConnection()
-                        ->performQuery('select * from notatable');
+                       ->performQuery('select * from notatable');
     }
 
     /**
@@ -56,13 +57,47 @@ class ConnectionTest extends TestCase
     /**
      * @test
      */
-    public function it_throws_a_connection_exception_on_prepare()
+    public function it_throws_a_connection_exception_on_query_run()
     {
         $expectedException = 'SQLSTATE[HY000] [2002] Connection timed out';
         $this->expectException(ConnectionException::class);
         $this->expectExceptionMessage($expectedException);
         $result = $this->mockedConnection(null, $expectedException)
                         ->performQuery('select * from users');
+    }
+
+    /**
+    * @test
+    */
+    public function connection_exceptions_run_callbacks()
+    {
+        $_ENV['marker'] = 'original';
+        $callBack = function (Throwable $e) {
+            $_ENV['marker'] = 'edited to '.$e->getMessage();
+        };
+
+        try {
+            $expectedException = 'server has gone away';
+            $this->mockedConnection($expectedException, null, $callBack)
+                        ->performQuery('select * from users');
+            $this->assertTrue(false);
+        } catch (ConnectionException $e) {
+            $this->assertSame('edited to server has gone away', $_ENV['marker']);
+        }
+    }
+
+    /**
+    * @test
+    */
+    public function connection_failures_are_retried_up_to_the_limit()
+    {
+        try {
+            $this->mockedConnection(null, 'server has gone away')
+                        ->performQuery('select * from users');
+            $this->assertTrue(false);
+        } catch (ConnectionException $e) {
+            $this->assertSame(3, $e->getAttempts());
+        }
     }
 
     private function realConnection($database = 'sqlite::memory:')
@@ -72,7 +107,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    private function mockedConnection($connectionMessage, $queryMessage = null)
+    private function mockedConnection($connectionMessage, $queryMessage = null, $callback = null)
     {
         $mock = new PDOExceptionThrower('sqlite::memory:');
         if ($connectionMessage) {
@@ -81,6 +116,8 @@ class ConnectionTest extends TestCase
         if ($queryMessage) {
             $mock->throwOnQuery($queryMessage);
         }
-        return new Connection($mock);
+        return new Connection(function () use ($mock) {
+            return $mock;
+        }, $callback);
     }
 }

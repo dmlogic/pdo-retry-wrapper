@@ -1,0 +1,5 @@
+parameters:
+    bootstrapFiles:
+        - vendor/autoload.php
+    excludes_analyse:
+        - 'src/Laravel/helper.php'

@@ -6,8 +6,6 @@ use PDO;
 
 class Migrator
 {
-    public $pdo;
-
     public function __invoke($database)
     {
         $pdo = $this->createConnection($database);

@@ -18,8 +18,6 @@ class StatementExceptionThrower extends PDOStatement
 
     public function execute($bindings = null)
     {
-        if ($this->queryException) {
-            throw new PDOException($this->queryException);
-        }
+        throw new PDOException($this->queryException);
     }
 }

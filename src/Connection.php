@@ -79,9 +79,6 @@ class Connection
 
     private function reconnect(): void
     {
-        if (!is_callable($this->connector)) {
-            throw new LogicException('No database connection defined');
-        }
         $this->pdo = call_user_func($this->connector);
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }

@@ -32,6 +32,7 @@
         "phpstan": "phpstan analyse src --level=0 --ansi",
         "phpcs": "php-cs-fixer fix -v --diff --allow-risky=yes --verbose --format=txt --dry-run",
         "phpcs-fix": "php-cs-fixer fix -v --diff --allow-risky=yes --verbose --format=txt",
+        "coverage": "./vendor/bin/phpunit --testdox --coverage-html coverage",
         "test": [
             "@phpstan",
             "@phpcs",

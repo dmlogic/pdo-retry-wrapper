@@ -6,10 +6,10 @@ use PDO;
 use Closure;
 use Throwable;
 use PDOStatement;
-use LogicException;
+use BadMethodCallException;
 use Illuminate\Database\DetectsLostConnections;
 
-class Connection
+class Connection extends PDO
 {
     use DetectsLostConnections;
 
@@ -72,7 +72,7 @@ class Connection
 
     private function reconnectIfMissingConnection(): void
     {
-        if (is_null($this->pdo)) {
+        if (!$this->pdo instanceof PDO) {
             $this->reconnect();
         }
     }
@@ -81,5 +81,73 @@ class Connection
     {
         $this->pdo = call_user_func($this->connector);
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    }
+
+    private function getPdo(): PDO
+    {
+        $this->reconnectIfMissingConnection();
+        return $this->pdo;
+    }
+
+    /**
+     * Down here we provide the full interface to PDO so that
+     * we can provide this class as a drop-in replacement
+     */
+
+    public function beginTransaction()
+    {
+        return $this->getPdo()->beginTransaction();
+    }
+    public function commit()
+    {
+        return $this->getPdo()->commit();
+    }
+    public function errorCode()
+    {
+        return $this->getPdo()->errorCode();
+    }
+    public function errorInfo()
+    {
+        return $this->getPdo()->errorInfo();
+    }
+    public function exec($statement)
+    {
+        return $this->getPdo()->exec($statement);
+    }
+    public function getAttribute($attribute)
+    {
+        return $this->getPdo()->getAttribute($attribute);
+    }
+    public function inTransaction()
+    {
+        return $this->getPdo()->inTransaction();
+    }
+    public function lastInsertId($name = null)
+    {
+        return $this->getPdo()->lastInsertId($name);
+    }
+    public function prepare($statement, $driver_options = [])
+    {
+        return $this->getPdo()->prepare($statement, $driver_options);
+    }
+    public function quote($string, $parameter_type = PDO::PARAM_STR)
+    {
+        return $this->getPdo()->quote($string, $parameter_type);
+    }
+    public function rollBack()
+    {
+        return $this->getPdo()->rollBack();
+    }
+    public function setAttribute($attribute, $value)
+    {
+        return $this->getPdo()->setAttribute($attribute, $value);
+    }
+    /**
+     * I don't need this, so I'm not putting in the legwork
+     * Use runQuery() instead
+     */
+    public function query($statement, $fetchMode = null, ...$fetchModeArgs)
+    {
+        throw new BadMethodCallException('Not implemented');
     }
 }

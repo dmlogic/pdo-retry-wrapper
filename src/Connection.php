@@ -25,14 +25,19 @@ class Connection extends PDO
         $this->exceptionCallback = $exceptionCallback;
     }
 
-    public function runQuery(string $sql, ?array $bindings = null): PDOStatement
+    public function setMaxAttempts(int $value)
+    {
+        $this->maxAttempts = $value;
+    }
+
+    public function runQuery(string $sql, ?array $bindings = null, ?array $options = []): PDOStatement
     {
         $this->currentAttempts = 1;
         $forceReconnect = false;
 
         while ($this->currentAttempts < $this->maxAttempts) {
             try {
-                return $this->connectAndPerformQuery($sql, $bindings, $forceReconnect);
+                return $this->connectAndPerformQuery($sql, $bindings, $options, $forceReconnect);
             } catch (Throwable $e) {
                 if (!$this->causedByLostConnection($e)) {
                     throw $e;
@@ -58,14 +63,14 @@ class Connection extends PDO
         throw $connectionException;
     }
 
-    private function connectAndPerformQuery(string $sql, ?array $bindings, bool $forceReconnect = false): PDOStatement
+    private function connectAndPerformQuery(string $sql, ?array $bindings, ?array $options = [], bool $forceReconnect = false): PDOStatement
     {
         if ($forceReconnect) {
             $this->reconnect();
         } else {
             $this->reconnectIfMissingConnection();
         }
-        $query = $this->pdo->prepare($sql);
+        $query = $this->pdo->prepare($sql, $options);
         $query->execute($bindings);
         return $query;
     }

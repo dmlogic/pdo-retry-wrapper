@@ -108,12 +108,28 @@ class ConnectionTest extends TestCase
     /**
     * @test
     */
+    public function adusted_max_attempts_value_is_applied()
+    {
+        try {
+            $conn = $this->mockedConnection(null, 'server has gone away');
+            $conn->setMaxAttempts(5);
+            $conn->runQuery('select * from users');
+            $this->assertTrue(false);
+        } catch (ConnectionException $e) {
+            $this->assertSame(5, $e->getAttempts());
+        }
+    }
+
+    /**
+    * @test
+    */
     public function it_implements_pdo_helpers()
     {
         $pdo = $this->realConnection();
         $this->assertSame('00000', $pdo->errorCode());
 
         $this->assertIsArray($pdo->errorInfo());
+        $this->assertSame('sqlite', $pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
 
         $statement = $pdo->prepare('UPDATE users set email = ? where id = ?');
         $this->assertInstanceOf(PDOStatement::class, $statement);

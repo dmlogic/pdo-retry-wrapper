@@ -4,7 +4,7 @@ namespace Tests;
 
 use RuntimeException;
 use PHPUnit\Framework\TestCase;
-use Dmlogic\PdoRetryWrapper\ConnectionException;
+use iHasco\PdoRetryWrapper\ConnectionException;
 
 class ConnectionExceptionTest extends TestCase
 {

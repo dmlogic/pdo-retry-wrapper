@@ -9,9 +9,9 @@ use PDOStatement;
 use BadMethodCallException;
 use Tests\Database\Migrator;
 use PHPUnit\Framework\TestCase;
-use Dmlogic\PdoRetryWrapper\Connection;
+use iHasco\PdoRetryWrapper\Connection;
 use Tests\Database\PDOExceptionThrower;
-use Dmlogic\PdoRetryWrapper\ConnectionException;
+use iHasco\PdoRetryWrapper\ConnectionException;
 
 class ConnectionTest extends TestCase
 {

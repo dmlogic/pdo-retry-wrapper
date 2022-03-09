@@ -3,7 +3,7 @@
     "description": "PDO wrapper to gracefully handle dropped connections",
     "autoload": {
         "psr-4": {
-            "Dmlogic\\PdoRetryWrapper\\": "src/"
+            "iHasco\\PdoRetryWrapper\\": "src/"
         }
     },
     "autoload-dev": {

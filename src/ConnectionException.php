@@ -1,6 +1,6 @@
 <?php
 
-namespace Dmlogic\PdoRetryWrapper;
+namespace iHasco\PdoRetryWrapper;
 
 use Exception;
 use Throwable;

@@ -108,7 +108,7 @@ class Connection extends PDO
     {
         return $this->getPdo()->commit();
     }
-    public function errorCode()
+    public function errorCode(): string
     {
         return $this->getPdo()->errorCode();
     }

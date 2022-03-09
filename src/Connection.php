@@ -72,6 +72,7 @@ class Connection extends PDO
         }
         $query = $this->pdo->prepare($sql, $options);
         $query->execute($bindings);
+
         return $query;
     }
 
@@ -99,11 +100,11 @@ class Connection extends PDO
      * we can provide this class as a drop-in replacement
      */
 
-    public function beginTransaction()
+    public function beginTransaction(): bool
     {
         return $this->getPdo()->beginTransaction();
     }
-    public function commit()
+    public function commit(): bool
     {
         return $this->getPdo()->commit();
     }
@@ -111,7 +112,7 @@ class Connection extends PDO
     {
         return $this->getPdo()->errorCode();
     }
-    public function errorInfo()
+    public function errorInfo(): array
     {
         return $this->getPdo()->errorInfo();
     }
@@ -123,7 +124,7 @@ class Connection extends PDO
     {
         return $this->getPdo()->getAttribute($attribute);
     }
-    public function inTransaction()
+    public function inTransaction(): bool
     {
         return $this->getPdo()->inTransaction();
     }
@@ -139,11 +140,11 @@ class Connection extends PDO
     {
         return $this->getPdo()->quote($string, $parameter_type);
     }
-    public function rollBack()
+    public function rollBack(): bool
     {
         return $this->getPdo()->rollBack();
     }
-    public function setAttribute($attribute, $value)
+    public function setAttribute($attribute, $value): bool
     {
         return $this->getPdo()->setAttribute($attribute, $value);
     }

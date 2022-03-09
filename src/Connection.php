@@ -34,19 +34,20 @@ class Connection extends PDO
     {
         $this->currentAttempts = 1;
         $forceReconnect = false;
+        return $this->connectAndPerformQuery($sql, $bindings, $options, $forceReconnect);
 
-        while ($this->currentAttempts < $this->maxAttempts) {
-            try {
-                return $this->connectAndPerformQuery($sql, $bindings, $options, $forceReconnect);
-            } catch (Throwable $e) {
-                if (!$this->causedByLostConnection($e)) {
-                    throw $e;
-                }
-                $forceReconnect = true;
-                $this->currentAttempts ++;
-            }
-        }
-        return $this->throwConnectionException($e, $sql, $bindings);
+        // while ($this->currentAttempts < $this->maxAttempts) {
+        //     try {
+        //         return $this->connectAndPerformQuery($sql, $bindings, $options, $forceReconnect);
+        //     } catch (Throwable $e) {
+        //         if (!$this->causedByLostConnection($e)) {
+        //             throw $e;
+        //         }
+        //         $forceReconnect = true;
+        //         $this->currentAttempts ++;
+        //     }
+        // }
+        // return $this->throwConnectionException($e, $sql, $bindings);
     }
 
     private function throwConnectionException(Throwable $originalException, string $sql, ?array $bindings)

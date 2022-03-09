@@ -1,5 +1,5 @@
 {
-    "name": "dmlogic/pdo-retry-wrapper",
+    "name": "ihasco/pdo-retry-wrapper",
     "description": "PDO wrapper to gracefully handle dropped connections",
     "autoload": {
         "psr-4": {

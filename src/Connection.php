@@ -157,6 +157,7 @@ class Connection extends PDO
      * I don't need this, so I'm not putting in the legwork
      * Use runQuery() instead
      */
+    #[\ReturnTypeWillChange]
     public function query($statement, $fetchMode = null, ...$fetchModeArgs)
     {
         throw new BadMethodCallException('Not implemented');
